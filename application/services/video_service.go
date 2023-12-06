@@ -71,9 +71,6 @@ func (service *VideoService) Fragment() error {
 	source := service.Video.FilePath
 	target := os.Getenv("localStorageFragPath") + "/" + service.Video.ID + "/" + "video-danca.frag"
 
-	log.Println(source)
-	log.Println(target)
-
 	cmd := exec.Command("mp4fragment", source, target)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -96,13 +93,12 @@ func (service *VideoService) Encode() error {
 	cmdArgs = append(cmdArgs, "/opt/bento4/bin")
 
 	cmd := exec.Command("mp4dash", cmdArgs...)
-	output, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatalln(err.Error())
 		return err
 	}
 
-	println(output)
 	return nil
 }
 
@@ -117,6 +113,5 @@ func (service *VideoService) Finish() error {
 		return err
 	}
 
-	log.Println("arquivos removidos")
 	return nil
 }

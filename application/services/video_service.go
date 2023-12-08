@@ -1,20 +1,16 @@
 package services
 
 import (
-	"context"
 	"encoder/application/repositories"
 	"encoder/domain"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
-
-	"cloud.google.com/go/storage"
 )
 
 type VideoService struct {
 	Video           *domain.Video
-	VideoRepository *repositories.VideoRepository
+	VideoRepository repositories.VideoRepository
 }
 
 func NewVideoService() VideoService {
@@ -23,38 +19,37 @@ func NewVideoService() VideoService {
 
 func (service *VideoService) Download(bucketName string) error {
 
-	ctx := context.Background()
+	// ctx := context.Background()
 
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		return err
-	}
+	// client, err := storage.NewClient(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
-	bkt := client.Bucket(bucketName)
-	obj := bkt.Object(service.Video.FilePath)
+	// bkt := client.Bucket(bucketName)
+	// obj := bkt.Object(service.Video.FilePath)
 
-	r, err := obj.NewReader(ctx)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
+	// r, err := obj.NewReader(ctx)
+	// if err != nil {
+	// return err
+	// }
+	// defer r.Close()
 
-	body, err := ioutil.ReadAll(r)
-	if err != nil {
-		return err
-	}
+	// body, err := ioutil.ReadAll(r)
+	// if err != nil {
+	// return err
+	// }
 
-	f, err := os.Create(os.Getenv("localStoragePath") + "/" + service.Video.ID + ".mp4")
-	if err != nil {
-		return err
-	}
+	// f, err := os.Create(os.Getenv("localStoragePath") + "/" + service.Video.ID + ".mp4")
+	// if err != nil {
+	// 	return err
+	// }
 
-	_, err = f.Write(body)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
+	// _, err = f.Write(body)
+	// if err != nil {
+	// 	return err
+	// }
+	// defer f.Close()
 
 	log.Printf("o video %v foi salvo", service.Video.ID)
 
@@ -62,9 +57,8 @@ func (service *VideoService) Download(bucketName string) error {
 }
 
 func (service *VideoService) Fragment() error {
-
 	if err := os.MkdirAll(os.Getenv("localStorageFragPath")+"/"+service.Video.ID, os.ModePerm); err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -74,11 +68,12 @@ func (service *VideoService) Fragment() error {
 	cmd := exec.Command("mp4fragment", source, target)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
 	println(output)
+
 	return nil
 }
 
@@ -110,6 +105,15 @@ func (service *VideoService) Finish() error {
 
 	if err := os.Remove(os.Getenv("localStorageFragPath") + "/" + service.Video.ID + "/video-danca.frag"); err != nil {
 		log.Fatalf("erro ao excluir o Frag: %v", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (service *VideoService) InsertVideo() error {
+	if _, err := service.VideoRepository.Insert(service.Video); err != nil {
+		log.Fatalf("erro ao inserir o video: %v", err.Error())
 		return err
 	}
 

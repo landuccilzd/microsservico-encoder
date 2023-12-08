@@ -20,7 +20,7 @@ func TestUploadService_Upload(t *testing.T) {
 	video, repositorio := prepare()
 	service := services.NewVideoService()
 	service.Video = video
-	service.VideoRepository = &repositorio
+	service.VideoRepository = repositorio
 
 	err := service.Fragment()
 	require.Nil(t, err)

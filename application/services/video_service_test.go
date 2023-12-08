@@ -38,7 +38,7 @@ func TesteVideoService_Download(t *testing.T) {
 	video, repositorio := prepare()
 	service := services.NewVideoService()
 	service.Video = video
-	service.VideoRepository = &repositorio
+	service.VideoRepository = repositorio
 
 	err := service.Download("nome_do_bucket")
 	require.Nil(t, err)
@@ -48,7 +48,7 @@ func TestVideoService_Fragment(t *testing.T) {
 	video, repositorio := prepare()
 	service := services.NewVideoService()
 	service.Video = video
-	service.VideoRepository = &repositorio
+	service.VideoRepository = repositorio
 
 	err := service.Fragment()
 	require.Nil(t, err)
@@ -58,7 +58,7 @@ func TestVideoService_Encode(t *testing.T) {
 	video, repositorio := prepare()
 	service := services.NewVideoService()
 	service.Video = video
-	service.VideoRepository = &repositorio
+	service.VideoRepository = repositorio
 
 	err := service.Fragment()
 	require.Nil(t, err)
